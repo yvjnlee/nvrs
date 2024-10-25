@@ -1,5 +1,5 @@
 # Specify the Go version if needed
-GOVERSION := 1.19
+GOVERSION := 1.23
 
 # Default target
 .PHONY: all
