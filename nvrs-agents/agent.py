@@ -1,12 +1,14 @@
+import os
 import requests
 
 class Agent:
-    def __init__(self, name, role, base_url):
+    def __init__(self, name, role, base_url=None):
         self.name = name
         self.role = role
-        self.base_url = base_url
+        # Use an environment variable for base_url; fallback to localhost for local testing
+        self.base_url = base_url or os.getenv("GATEWAY_HOST", "http://localhost:8080")
         self.token = None        # JWT token, assigned after registration
-        self.agent_id = None      # Agent ID, assigned after registration
+        self.agent_id = None     # Agent ID, assigned after registration
 
     def register(self):
         url = f"{self.base_url}/agents/register"
@@ -57,7 +59,8 @@ class Agent:
 
 # Testing
 if __name__ == "__main__":
-    base_url = "http://localhost:8080"  # Replace with your server URL
+    # No hardcoding; use an environment variable for the base URL
+    base_url = os.getenv("GATEWAY_HOST", "http://localhost:8080")
     agent = Agent("Agent007", "Spy", base_url)
     
     agent.register()
