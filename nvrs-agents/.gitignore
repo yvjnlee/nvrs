@@ -1,0 +1,22 @@
+# Virtual environment directories
+venv/
+env/
+
+# Python bytecode files
+__pycache__/
+*.py[cod]
+
+# Log files and temporary files
+*.log
+*.tmp
+*.swp
+
+# Jupyter Notebook checkpoints (if using notebooks)
+.ipynb_checkpoints/
+
+# Environment files
+.env
+
+# OS-specific files
+.DS_Store
+Thumbs.db
