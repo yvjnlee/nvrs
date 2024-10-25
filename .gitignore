@@ -6,17 +6,14 @@
 *.dylib
 *.out
 
-# Dependency directories (vendor if you use vendoring)
-/vendor/
-
-# Logs and runtime files
-*.log
-
 # Environment variables file
 .env
 
 # macOS-specific files
 .DS_Store
+
+# GitHub workflows cache
+.github/workflows/*.yaml~
 
 # Test binary files and cache
 testdata/

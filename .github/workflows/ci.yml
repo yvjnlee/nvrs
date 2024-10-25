@@ -1,0 +1,43 @@
+name: CI Pipeline
+
+on:
+  push:    # Trigger on push to any branch
+  pull_request:    # Trigger on pull request to any branch
+
+jobs:
+  # Job for Go backend in nvrs-gateway
+  nvrs-gateway-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.19'
+
+      - name: Run Makefile for nvrs-gateway
+        run: |
+          cd nvrs-gateway
+          make test
+
+  # Haven't implemented yet
+  # Job for Python agents in nvrs-agents
+  # nvrs-agents-test:
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
+
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: '3.x'
+
+  #     - name: Run Makefile for nvrs-agents
+  #       run: |
+  #         cd nvrs-agents
+  #         make test
