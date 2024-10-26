@@ -7,7 +7,7 @@ grpc_client_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../g
 sys.path.append(grpc_client_path)
 
 # Import gRPC client methods
-from grpc_client import update_status as grpc_update_status, submit_task as grpc_submit_task
+from grpc_client import update_status, submit_task
 
 class Agent:
     def __init__(self, name, role, base_url=None):
@@ -41,7 +41,7 @@ class Agent:
         """Submit a task using gRPC."""
         if self.agent_id and self.token:
             print(f"Submitting task: {task_description} via gRPC...")
-            grpc_submit_task(self.agent_id, task_description)
+            submit_task(self.agent_id, task_description)
         else:
             print("Agent not registered. Cannot submit task.")
 
@@ -49,7 +49,7 @@ class Agent:
         """Update the agent's status using gRPC."""
         if self.agent_id and self.token:
             print(f"Updating status to: {status} via gRPC...")
-            grpc_update_status(self.agent_id, status)
+            update_status(self.agent_id, status)
         else:
             print("Agent not registered. Cannot update status.")
 

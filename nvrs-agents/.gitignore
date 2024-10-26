@@ -5,6 +5,7 @@ env/
 # Python bytecode files
 __pycache__/
 *.py[cod]
+*.cache
 
 # Log files and temporary files
 *.log
