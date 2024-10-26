@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package protos;
+
+// Specify the Go package path here
+option go_package = "protos/";
+
+service AgentService {
+  rpc UpdateStatus (StatusRequest) returns (StatusResponse);
+  rpc SubmitTask (TaskRequest) returns (TaskResponse);
+}
+
+message StatusRequest {
+  int32 agent_id = 1;
+  string status = 2;
+}
+
+message StatusResponse {
+  string message = 1;
+}
+
+message TaskRequest {
+  int32 agent_id = 1;
+  string task = 2;
+}
+
+message TaskResponse {
+  string message = 1;
+}
