@@ -1,7 +1,7 @@
 import os
 import sys
 import logging
-from autogen.agentchat import ConversableAgent, UserProxyAgent
+import autogen
 import requests
 from dotenv import load_dotenv
 
@@ -19,20 +19,28 @@ llm_config = {"model": "gpt-4", "api_key": os.getenv("OPENAI_API_KEY")}
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
 
-class CustomAgent(ConversableAgent):
+class CustomAgent():
     def __init__(self, name, role, base_url=None):
-        super().__init__(name=name, description=role, llm_config=llm_config)
+        self.name = name
         self.role = role
         self.base_url = base_url or "http://localhost:8080"
         self.agent_id = None
         self.token = None
 
+        self.agent = autogen.AssistantAgent(
+            name=name,
+            llm_config=llm_config,
+        )
+
         # Initialize user proxy agent for human interaction
-        self.user_proxy = UserProxyAgent(
-            "user_proxy",
-            llm_config=False,
+        self.user_proxy = autogen.UserProxyAgent(
+            name="user",
             human_input_mode="ALWAYS",
-            code_execution_config={"use_docker": False}
+            llm_config=False,
+            code_execution_config={
+                "work_dir": "coding",
+                "use_docker": False
+            }
         )
 
     def register(self):
@@ -86,23 +94,25 @@ class CustomAgent(ConversableAgent):
         """Start conversation with user or another agent."""
         if recipient is None:
             logging.info("Conversation started. Type 'exit' to end.")
-            while True:
-                user_message = input("You: ")
-                if user_message.lower() == 'exit':
-                    logging.info("Ending conversation.")
-                    break
+            user_message = input("Initiate chat: ")
 
+            while True:
                 try:
-                    result = self.user_proxy.initiate_chat(self, message=user_message)
-                    if isinstance(result, list) and result and isinstance(result[0], str):
+                    result = self.user_proxy.initiate_chat(self.agent, message=user_message)
+                    logging.debug(f"initiate_chat returned: {result}")
+
+                    if isinstance(result, list) and result:  # Checks if result is a non-empty list
                         logging.info(f"{self.name}: {result[0]}")
+                    elif result is None:
+                        logging.warning("Received None from initiate_chat, possibly due to an error.")
+                        break
                     else:
-                        logging.error(f"Unexpected result format or empty response: {result}")
-                        logging.info(f"{self.name}: (No valid response received)")
-                except IndexError:
-                    logging.error("Result from initiate_chat was empty.")
+                        logging.warning("Received an unexpected response format.")
+                        break
                 except Exception as e:
                     logging.error(f"Unexpected error during conversation: {e}")
+                    break
+
         else:
             initial_message = "Hello, let's start the task."
             self.send(initial_message, recipient)
