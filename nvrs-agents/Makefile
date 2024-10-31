@@ -27,7 +27,7 @@ run-grpc-client:
 # Run the main agent application
 .PHONY: run-agent
 run-agent:
-	$(VENV_DIR)/bin/python agents/agent.py
+	$(VENV_DIR)/bin/python agents/autogen_agent.py
 
 # Clean up environment
 .PHONY: clean

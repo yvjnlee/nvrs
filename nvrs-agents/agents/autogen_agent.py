@@ -14,7 +14,7 @@ from grpc_client import update_status, submit_task
 load_dotenv()
 
 # Set GPT-4 API key configuration
-llm_config = {"model": "gpt-4", "api_key": os.getenv("OPENAI_API_KEY")}
+llm_config = {"model": "gpt-4o", "api_key": os.getenv("OPENAI_API_KEY")}
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
@@ -35,7 +35,6 @@ class CustomAgent():
         # Initialize user proxy agent for human interaction
         self.user_proxy = autogen.UserProxyAgent(
             name="user",
-            human_input_mode="ALWAYS",
             llm_config=False,
             code_execution_config={
                 "work_dir": "coding",
@@ -119,11 +118,33 @@ class CustomAgent():
 
 # Testing the CustomAgent
 if __name__ == "__main__":
+    def weather_tool(location: str = "unspecified location") -> str:
+        """Returns a simple weather description."""
+        return f"The weather in {location} is hot today."
+    
+    def task_tool(task_description: str = "some task") -> bool:
+        """Submit a task using gRPC client."""
+        if agent.agent_id:
+            logging.info(f"Submitting task: {task_description}")
+            try:
+                submit_task(agent.agent_id, task_description)
+                return True
+            except Exception as e:
+                logging.error(f"Task submission failed: {e}")
+        else:
+            logging.warning("Agent is not registered, task cannot be submitted.")
+            return False
+    
     agent = CustomAgent("AutoAgent001", "DataAnalyzer")
+
+    agent.agent.register_for_llm(name="weather_tool", description="weather tool")(weather_tool)
+    agent.user_proxy.register_for_execution(name="weather_tool")(weather_tool)
+
+    agent.agent.register_for_llm(name="task_tool", description="task tool")(task_tool)
+    agent.user_proxy.register_for_execution(name="task_tool")(task_tool)
+
     try:
         agent.register()
-        agent.update_status("active")
-        agent.perform_task("Analyze financial data")
         agent.start_conversation()
     except Exception as e:
         logging.error(f"An error occurred in main execution: {e}")
